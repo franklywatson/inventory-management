@@ -168,6 +168,12 @@
       :cost-data="selectedCostData"
       @close="showCostModal = false"
     />
+
+    <TransactionDetailModal
+      :is-open="showTransactionModal"
+      :transaction="selectedTransaction"
+      @close="showTransactionModal = false"
+    />
   </div>
 </template>
 
@@ -178,11 +184,13 @@ import { useFilters } from '../composables/useFilters'
 import { useI18n } from '../composables/useI18n'
 import { formatCurrency as formatCurrencyUtil } from '../utils/currency'
 import CostDetailModal from '../components/CostDetailModal.vue'
+import TransactionDetailModal from '../components/TransactionDetailModal.vue'
 
 export default {
   name: 'Spending',
   components: {
-    CostDetailModal
+    CostDetailModal,
+    TransactionDetailModal
   },
   setup() {
     const { t, currentCurrency } = useI18n()
@@ -197,6 +205,8 @@ export default {
     // Modal state
     const showCostModal = ref(false)
     const selectedCostData = ref(null)
+    const showTransactionModal = ref(false)
+    const selectedTransaction = ref(null)
 
     // Use shared filters
     const { selectedPeriod, getCurrentFilters } = useFilters()
@@ -448,8 +458,8 @@ export default {
     }
 
     const handleTransactionClick = (transaction) => {
-      console.log('Transaction clicked:', transaction)
-      alert(`Transaction Details:\n\nID: ${transaction.id}\nDescription: ${transaction.description}\nVendor: ${transaction.vendor}\nDate: ${formatDateShort(transaction.date)}\nAmount: $${transaction.amount.toLocaleString()}`)
+      selectedTransaction.value = transaction
+      showTransactionModal.value = true
     }
 
     const showCostDetail = (monthData) => {
@@ -485,6 +495,8 @@ export default {
       showCostModal,
       selectedCostData,
       showCostDetail,
+      showTransactionModal,
+      selectedTransaction,
       Math
     }
   }
