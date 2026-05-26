@@ -5,7 +5,11 @@
       "command": "npx",
       "args": [
         "-y",
-        "@playwright/mcp@0.0.37"
+        "@playwright/mcp@0.0.37",
+        "--browser",
+        "chrome",
+        "--executable-path",
+        "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser"
       ],
       "env": {}
     },
