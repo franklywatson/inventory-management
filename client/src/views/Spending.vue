@@ -8,6 +8,12 @@
     <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
+      <!-- Filter scope notice: only Time Period applies on this page -->
+      <div class="filter-scope-notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        On this page, only the <strong>Time Period</strong> filter applies. Warehouse, Category, and Status filters have no effect on financial data.
+      </div>
+
       <!-- Revenue & Financial KPIs -->
       <div class="stats-grid-finance">
         <div class="stat-card revenue-card">
@@ -848,5 +854,24 @@ export default {
 
 .text-right {
   text-align: right;
+}
+
+.filter-scope-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #1e40af;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+.filter-scope-notice svg {
+  flex-shrink: 0;
+  color: #3b82f6;
 }
 </style>
