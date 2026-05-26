@@ -68,7 +68,6 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import { api } from './api'
 import { useAuth } from './composables/useAuth'
 import { useI18n } from './composables/useI18n'
 import FilterBar from './components/FilterBar.vue'
@@ -103,6 +102,7 @@ export default {
     // Double-chevron icons for the collapse toggle button
     const collapseIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6"/></svg>`
     const expandIcon   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/><polyline points="15 18 21 12 15 6"/></svg>`
+    // Tasks persisted to localStorage (replaces /api/tasks which returns 404)
     const apiTasks = ref([])
 
     // SVG icons for each nav item — inline so no icon library needed
@@ -144,55 +144,56 @@ export default {
       return [...currentUser.value.tasks, ...apiTasks.value]
     })
 
-    const loadTasks = async () => {
-      try {
-        apiTasks.value = await api.getTasks()
-      } catch (err) {
-        console.error('Failed to load tasks:', err)
+    const saveTasksToStorage = () => {
+      localStorage.setItem('inventory-tasks', JSON.stringify(apiTasks.value))
+    }
+
+    const loadTasks = () => {
+      // Load tasks from localStorage instead of /api/tasks (which returns 404)
+      const stored = localStorage.getItem('inventory-tasks')
+      apiTasks.value = stored ? JSON.parse(stored) : []
+    }
+
+    const addTask = (taskData) => {
+      const newTask = {
+        id: `task-${Date.now()}`,
+        title: taskData.title || taskData,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }
+      // Add new task to the beginning of the array
+      apiTasks.value.unshift(newTask)
+      saveTasksToStorage()
+    }
+
+    const deleteTask = (taskId) => {
+      // Check if it's a mock task (from currentUser)
+      const isMockTask = currentUser.value.tasks.some(t => t.id === taskId)
+      if (isMockTask) {
+        const index = currentUser.value.tasks.findIndex(t => t.id === taskId)
+        if (index !== -1) currentUser.value.tasks.splice(index, 1)
+      } else {
+        apiTasks.value = apiTasks.value.filter(t => t.id !== taskId)
+        saveTasksToStorage()
       }
     }
 
-    const addTask = async (taskData) => {
-      try {
-        const newTask = await api.createTask(taskData)
-        // Add new task to the beginning of the array
-        apiTasks.value.unshift(newTask)
-      } catch (err) {
-        console.error('Failed to add task:', err)
-      }
-    }
-
-    const deleteTask = async (taskId) => {
-      try {
-        // Check if it's a mock task (from currentUser)
-        const isMockTask = currentUser.value.tasks.some(t => t.id === taskId)
-        if (isMockTask) {
-          const index = currentUser.value.tasks.findIndex(t => t.id === taskId)
-          if (index !== -1) currentUser.value.tasks.splice(index, 1)
-        } else {
-          await api.deleteTask(taskId)
-          apiTasks.value = apiTasks.value.filter(t => t.id !== taskId)
+    const toggleTask = (taskId) => {
+      // Check if it's a mock task (from currentUser)
+      const mockTask = currentUser.value.tasks.find(t => t.id === taskId)
+      if (mockTask) {
+        // Toggle mock task status
+        mockTask.status = mockTask.status === 'pending' ? 'completed' : 'pending'
+      } else {
+        // Toggle localStorage task
+        const index = apiTasks.value.findIndex(t => t.id === taskId)
+        if (index !== -1) {
+          apiTasks.value[index] = {
+            ...apiTasks.value[index],
+            status: apiTasks.value[index].status === 'pending' ? 'completed' : 'pending'
+          }
+          saveTasksToStorage()
         }
-      } catch (err) {
-        console.error('Failed to delete task:', err)
-      }
-    }
-
-    const toggleTask = async (taskId) => {
-      try {
-        // Check if it's a mock task (from currentUser)
-        const mockTask = currentUser.value.tasks.find(t => t.id === taskId)
-        if (mockTask) {
-          // Toggle mock task status
-          mockTask.status = mockTask.status === 'pending' ? 'completed' : 'pending'
-        } else {
-          // Toggle API task
-          const updatedTask = await api.toggleTask(taskId)
-          const index = apiTasks.value.findIndex(t => t.id === taskId)
-          if (index !== -1) apiTasks.value[index] = updatedTask
-        }
-      } catch (err) {
-        console.error('Failed to toggle task:', err)
       }
     }
 
