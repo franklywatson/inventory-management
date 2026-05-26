@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell">
+  <div class="app-shell" :class="{ collapsed }">
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-logo">C</div>
@@ -14,6 +14,7 @@
           v-for="item in navItems"
           :key="item.path"
           :to="item.path"
+          :title="item.label"
           class="nav-item"
           :class="{ active: $route.path === item.path }"
         >
@@ -23,6 +24,14 @@
       </nav>
 
       <div class="sidebar-footer">
+        <button
+          class="sidebar-toggle"
+          @click="toggleSidebar"
+          :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        >
+          <span class="toggle-icon" v-html="collapsed ? expandIcon : collapseIcon"></span>
+          <span class="toggle-label">Collapse</span>
+        </button>
         <LanguageSwitcher />
         <ProfileMenu
           @show-profile-details="showProfileDetails = true"
