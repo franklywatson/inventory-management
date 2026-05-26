@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Factory IMS — System Architecture</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      padding: 28px 40px;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .header-eyebrow {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .header-desc {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .port-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge-blue  { border-color: #1d4ed8; background: #0f2744; color: #60a5fa; }
+    .badge-violet { border-color: #5b21b6; background: #1e1040; color: #a78bfa; }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .8;
+    }
+    .gradient-rule {
+      height: 2px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+    }
+
+    /* ── Main grid ── */
+    main {
+      max-width: 1200px;
+      margin: 36px auto;
+      padding: 0 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* ── Column cards ── */
+    .col {
+      background: #1e293b;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      overflow: hidden;
+    }
+    .col-header {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .col-accent {
+      width: 3px;
+      height: 20px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .accent-cyan   { background: #38bdf8; }
+    .accent-violet { background: #818cf8; }
+    .accent-green  { background: #34d399; }
+
+    .col-header h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      color: #f1f5f9;
+    }
+    .col-header .col-num {
+      margin-left: auto;
+      font-size: 11px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .col-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Architecture layers ── */
+    .layer {
+      border-radius: 7px;
+      border: 1px solid;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .layer-cyan   { border-color: #0e4a6b; background: #0c1f30; }
+    .layer-violet { border-color: #3b2d6e; background: #120d28; }
+    .layer-green  { border-color: #0a3d2a; background: #061a12; }
+    .layer-slate  { border-color: #334155; background: #0f172a; }
+
+    .layer-icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .layer-content {}
+    .layer-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 2px;
+    }
+    .layer-sub {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .layer-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      background: #0f172a;
+    }
+    .tag-cyan   { border-color: #0e4a6b; color: #38bdf8; }
+    .tag-violet { border-color: #3b2d6e; color: #818cf8; }
+    .tag-green  { border-color: #0a3d2a; color: #34d399; }
+
+    .arrow {
+      text-align: center;
+      color: #475569;
+      font-size: 16px;
+      line-height: 1;
+      margin: -4px 0;
+    }
+
+    /* ── Tech stack ── */
+    .stack-group {}
+    .stack-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+    .stack-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stack-item {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+    }
+    .stack-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      min-width: 90px;
+      flex-shrink: 0;
+    }
+    .stack-desc {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .divider {
+      height: 1px;
+      background: #334155;
+      margin: 4px 0;
+    }
+
+    /* ── Data flow steps ── */
+    .flow-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 10px;
+      font-weight: 700;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-num.active { border-color: #34d399; color: #34d399; }
+    .step-content {}
+    .step-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 1px;
+    }
+    .step-detail {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .step-connector {
+      margin-left: 11px;
+      width: 1px;
+      height: 10px;
+      background: #334155;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #1e293b;
+      padding: 18px 40px;
+      margin-top: 12px;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .footer-note {
+      font-size: 11px;
+      color: #475569;
+    }
+    .footer-note strong {
+      color: #64748b;
+    }
+    .footer-chips {
+      display: flex;
+      gap: 8px;
+    }
+    .chip {
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <div class="header-eyebrow">System Architecture</div>
+        <h1>Factory Inventory Management System</h1>
+        <p class="header-desc">Full-stack demo · Vue 3 frontend · Python FastAPI backend · In-memory JSON data</p>
+      </div>
+      <div class="port-badges">
+        <div class="badge badge-blue"><div class="dot"></div> Frontend :3000</div>
+        <div class="badge badge-violet"><div class="dot"></div> Backend :8001</div>
+      </div>
+    </div>
+  </header>
+  <div class="gradient-rule"></div>
+
+  <main>
+
+    <!-- ── Column 1: System Architecture ── -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-accent accent-cyan"></div>
+        <h2>System Architecture</h2>
+        <span class="col-num">01</span>
+      </div>
+      <div class="col-body">
+
+        <div class="layer layer-cyan">
+          <div class="layer-icon">🖥</div>
+          <div class="layer-content">
+            <div class="layer-title">Browser / User</div>
+            <div class="layer-sub">SPA loaded once; all navigation handled client-side via Vue Router</div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer layer-cyan">
+          <div class="layer-icon">⚡</div>
+          <div class="layer-content">
+            <div class="layer-title">Vue 3 SPA</div>
+            <div class="layer-sub">Composition API views, shared filter state via composables, reactive computed properties</div>
+            <div class="layer-tags">
+              <span class="tag tag-cyan">Dashboard</span>
+              <span class="tag tag-cyan">Inventory</span>
+              <span class="tag tag-cyan">Orders</span>
+              <span class="tag tag-cyan">Demand</span>
+              <span class="tag tag-cyan">Spending</span>
+              <span class="tag tag-cyan">Reports</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓ HTTP / Axios</div>
+
+        <div class="layer layer-violet">
+          <div class="layer-icon">🐍</div>
+          <div class="layer-content">
+            <div class="layer-title">FastAPI Backend</div>
+            <div class="layer-sub">REST endpoints with query-param filtering; Pydantic models validate all responses; CORS open in dev</div>
+            <div class="layer-tags">
+              <span class="tag tag-violet">/api/inventory</span>
+              <span class="tag tag-violet">/api/orders</span>
+              <span class="tag tag-violet">/api/dashboard</span>
+              <span class="tag tag-violet">/api/spending</span>
+              <span class="tag tag-violet">/api/demand</span>
+              <span class="tag tag-violet">/api/reports</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer layer-green">
+          <div class="layer-icon">📂</div>
+          <div class="layer-content">
+            <div class="layer-title">JSON Data Files</div>
+            <div class="layer-sub">Loaded into memory at startup via mock_data.py; filtered on each request — no database</div>
+            <div class="layer-tags">
+              <span class="tag tag-green">inventory.json</span>
+              <span class="tag tag-green">orders.json</span>
+              <span class="tag tag-green">spending.json</span>
+              <span class="tag tag-green">transactions.json</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Column 2: Tech Stack ── -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-accent accent-violet"></div>
+        <h2>Tech Stack</h2>
+        <span class="col-num">02</span>
+      </div>
+      <div class="col-body">
+
+        <div class="stack-group">
+          <div class="stack-label">Frontend</div>
+          <div class="stack-items">
+            <div class="stack-item">
+              <div class="stack-name">Vue 3</div>
+              <div class="stack-desc">Composition API throughout — refs, computed, composables</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">Vue Router 4</div>
+              <div class="stack-desc">Client-side routing for 6 views; history mode</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">Vite</div>
+              <div class="stack-desc">Dev server (port 3000), HMR, production bundler</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">Axios</div>
+              <div class="stack-desc">HTTP client; all calls centralised in api.js</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">i18n</div>
+              <div class="stack-desc">English / Japanese; locale persisted in localStorage</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stack-group">
+          <div class="stack-label">Backend</div>
+          <div class="stack-items">
+            <div class="stack-item">
+              <div class="stack-name">FastAPI</div>
+              <div class="stack-desc">Async Python REST framework; auto OpenAPI docs at /docs</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">Pydantic</div>
+              <div class="stack-desc">Response model validation and serialisation</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">Uvicorn</div>
+              <div class="stack-desc">ASGI server; runs on port 8001</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">uv</div>
+              <div class="stack-desc">Python package manager and virtual env runner</div>
+            </div>
+            <div class="stack-item">
+              <div class="stack-name">pytest</div>
+              <div class="stack-desc">Backend test suite with FastAPI TestClient</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Column 3: Data Flow ── -->
+    <div class="col">
+      <div class="col-header">
+        <div class="col-accent accent-green"></div>
+        <h2>Data Flow</h2>
+        <span class="col-num">03</span>
+      </div>
+      <div class="col-body">
+
+        <div class="flow-step">
+          <div class="step-num active">1</div>
+          <div class="step-content">
+            <div class="step-title">User changes a filter</div>
+            <div class="step-detail">Time Period, Warehouse, Category, or Order Status dropdown in the top filter bar</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">2</div>
+          <div class="step-content">
+            <div class="step-title">useFilters() updates</div>
+            <div class="step-detail">Singleton composable holds shared reactive refs — selectedPeriod, selectedLocation, selectedCategory, selectedStatus</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">3</div>
+          <div class="step-content">
+            <div class="step-title">Component watch fires</div>
+            <div class="step-detail">Each view watches filter state and calls the relevant api.js method when any value changes</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">4</div>
+          <div class="step-content">
+            <div class="step-title">Axios sends GET request</div>
+            <div class="step-detail">api.js builds URLSearchParams (warehouse, category, status, month) and calls the FastAPI endpoint</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">5</div>
+          <div class="step-content">
+            <div class="step-title">FastAPI filters in memory</div>
+            <div class="step-detail">apply_filters() and filter_by_month() iterate over the in-memory JSON arrays; skips filters set to "all"</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">6</div>
+          <div class="step-content">
+            <div class="step-title">Pydantic validates response</div>
+            <div class="step-detail">Response model enforces types and strips unknown fields before serialising to JSON</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">7</div>
+          <div class="step-content">
+            <div class="step-title">Vue refs updated</div>
+            <div class="step-detail">Component assigns response data to reactive refs (allOrders, inventoryItems, etc.) inside try/catch/finally</div>
+          </div>
+        </div>
+        <div class="step-connector"></div>
+
+        <div class="flow-step">
+          <div class="step-num active">8</div>
+          <div class="step-content">
+            <div class="step-title">Computed properties re-render</div>
+            <div class="step-detail">Derived data (totals, filtered lists, chart values) recalculates automatically; Vue updates only the changed DOM nodes</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-note">
+        <strong>Note:</strong> In-memory mock data only — no database, no authentication, no persistence. Demo and training use only.
+      </div>
+      <div class="footer-chips">
+        <div class="chip">No DB</div>
+        <div class="chip">No Auth</div>
+        <div class="chip">Demo Only</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
