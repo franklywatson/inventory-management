@@ -209,19 +209,14 @@
                     </span>
                   </td>
                   <td>
+                    <!-- PurchaseOrderModal not yet implemented -->
                     <button
-                      v-if="!item.purchase_order_id"
-                      @click.stop="openPOModal(item)"
                       class="po-button create"
+                      disabled
+                      title="Purchase order creation coming soon"
+                      style="opacity: 0.5; cursor: not-allowed;"
                     >
                       Create PO
-                    </button>
-                    <button
-                      v-else
-                      @click.stop="viewPO(item)"
-                      class="po-button view"
-                    >
-                      View PO
                     </button>
                   </td>
                 </tr>
@@ -286,13 +281,7 @@
       @close="showBacklogModal = false"
     />
 
-    <PurchaseOrderModal
-      :is-open="showPOModal"
-      :backlog-item="selectedBacklogForPO"
-      :mode="poModalMode"
-      @close="showPOModal = false"
-      @po-created="handlePOCreated"
-    />
+    <!-- PurchaseOrderModal not yet implemented -->
   </div>
 </template>
 
@@ -324,9 +313,7 @@ export default {
     const selectedProduct = ref(null)
     const showBacklogModal = ref(false)
     const selectedBacklogItem = ref(null)
-    const showPOModal = ref(false)
-    const selectedBacklogForPO = ref(null)
-    const poModalMode = ref('create')
+    // PurchaseOrderModal not yet implemented — showPOModal state removed
 
     // Use shared filters
     const {
@@ -650,28 +637,6 @@ export default {
       showBacklogModal.value = true
     }
 
-    const openPOModal = (item) => {
-      selectedBacklogForPO.value = item
-      poModalMode.value = 'create'
-      showPOModal.value = true
-    }
-
-    const viewPO = (item) => {
-      selectedBacklogForPO.value = item
-      poModalMode.value = 'view'
-      showPOModal.value = true
-    }
-
-    const handlePOCreated = (poData) => {
-      // Update the backlog item with the new PO ID
-      const item = allBacklogItems.value.find(b => b.id === poData.backlog_item_id)
-      if (item) {
-        item.purchase_order_id = poData.id
-        item.purchase_order = poData
-      }
-      showPOModal.value = false
-    }
-
     // Watch for filter changes and reload data
     watch([selectedPeriod, selectedLocation, selectedCategory, selectedStatus], () => {
       loadData()
@@ -715,12 +680,7 @@ export default {
       Math,
       translateProductName,
       translateWarehouse,
-      showPOModal,
-      selectedBacklogForPO,
-      poModalMode,
-      openPOModal,
-      viewPO,
-      handlePOCreated
+      // PurchaseOrderModal not yet implemented — PO modal state/methods removed
     }
   }
 }
