@@ -25,12 +25,15 @@
 
       <div class="sidebar-footer">
         <button
+          type="button"
           class="sidebar-toggle"
           @click="toggleSidebar"
+          :aria-expanded="String(!collapsed)"
+          aria-label="Toggle sidebar"
           :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
         >
           <span class="toggle-icon" v-html="collapsed ? expandIcon : collapseIcon"></span>
-          <span class="toggle-label">Collapse</span>
+          <span class="toggle-label">{{ collapsed ? 'Expand' : 'Collapse' }}</span>
         </button>
         <LanguageSwitcher />
         <ProfileMenu
