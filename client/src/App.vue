@@ -245,6 +245,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.2s ease; /* smooth collapse animation */
 }
 
 /* Brand section */
@@ -495,5 +496,82 @@ tbody tr:hover { background: #f8fafc; }
   border-radius: 8px;
   margin: 1rem 0;
   font-size: 0.938rem;
+}
+
+/* ── Collapsed sidebar state ─────────────────────────── */
+
+/* Narrow the sidebar to icon-rail width */
+.app-shell.collapsed .sidebar {
+  width: 56px;
+}
+
+/* Brand: center the logo, hide the text */
+.app-shell.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 20px 0 16px;
+}
+.app-shell.collapsed .sidebar-brand-text {
+  display: none;
+}
+
+/* Nav items: center icon, hide label */
+.app-shell.collapsed .nav-item {
+  justify-content: center;
+  padding: 9px 0;
+}
+.app-shell.collapsed .nav-label {
+  display: none;
+}
+
+/* Toggle button base styles */
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  margin-bottom: 4px;
+}
+.sidebar-toggle:hover {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+.toggle-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Toggle button: center icon, hide label when collapsed */
+.app-shell.collapsed .sidebar-toggle {
+  justify-content: center;
+  padding: 8px 0;
+}
+.app-shell.collapsed .toggle-label {
+  display: none;
+}
+
+/* Hide LanguageSwitcher in collapsed mode (too wide for 56px) */
+.app-shell.collapsed .sidebar-footer .language-switcher {
+  display: none;
+}
+
+/* ProfileMenu: show avatar only, hide name and chevron */
+.app-shell.collapsed .sidebar-footer .profile-name,
+.app-shell.collapsed .sidebar-footer .chevron {
+  display: none;
+}
+.app-shell.collapsed .sidebar-footer .profile-button {
+  justify-content: center;
+  padding: 4px;
+  width: 100%;
 }
 </style>
