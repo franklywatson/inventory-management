@@ -79,6 +79,18 @@ export default {
     const { t } = useI18n()
     const showProfileDetails = ref(false)
     const showTasks = ref(false)
+
+    // Persist sidebar collapsed state across page refreshes
+    const collapsed = ref(localStorage.getItem('sidebar-collapsed') === 'true')
+
+    const toggleSidebar = () => {
+      collapsed.value = !collapsed.value
+      localStorage.setItem('sidebar-collapsed', String(collapsed.value))
+    }
+
+    // Double-chevron icons for the collapse toggle button
+    const collapseIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6"/></svg>`
+    const expandIcon   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/><polyline points="15 18 21 12 15 6"/></svg>`
     const apiTasks = ref([])
 
     // SVG icons for each nav item — inline so no icon library needed
@@ -177,6 +189,10 @@ export default {
     return {
       t,
       navItems,
+      collapsed,
+      toggleSidebar,
+      collapseIcon,
+      expandIcon,
       showProfileDetails,
       showTasks,
       tasks,
