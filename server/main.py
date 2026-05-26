@@ -25,8 +25,9 @@ def filter_by_month(items: list, month: Optional[str]) -> list:
             months = QUARTER_MAP[month]
             return [item for item in items if any(m in item.get('order_date', '') for m in months)]
     else:
-        # Direct month match
-        return [item for item in items if month in item.get('order_date', '')]
+        # Direct month match — use startswith() for exact YYYY-MM prefix,
+        # avoiding false positives from substring matches (e.g. '05' in '2025-05-01')
+        return [item for item in items if item.get('order_date', '').startswith(month)]
 
     return items
 
