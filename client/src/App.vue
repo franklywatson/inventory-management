@@ -244,7 +244,7 @@ body {
   border-right: 1px solid #1e293b;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-width: 0;
   transition: width 0.2s ease; /* smooth collapse animation */
 }
 
@@ -514,6 +514,15 @@ tbody tr:hover { background: #f8fafc; }
   display: none;
 }
 
+/* Prevent text from overflowing during width transition */
+.nav-label,
+.sidebar-brand-name,
+.sidebar-brand-sub,
+.toggle-label {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Nav items: center icon, hide label */
 .app-shell.collapsed .nav-item {
   justify-content: center;
@@ -566,7 +575,7 @@ tbody tr:hover { background: #f8fafc; }
 
 /* ProfileMenu: show avatar only, hide name and chevron */
 .app-shell.collapsed .sidebar-footer .profile-name,
-.app-shell.collapsed .sidebar-footer .chevron {
+.app-shell.collapsed .sidebar-footer .profile-menu .chevron {
   display: none;
 }
 .app-shell.collapsed .sidebar-footer .profile-button {
